@@ -1,0 +1,21 @@
+{
+    "name": "npmweb/git-api-client",
+    "description": "Provides access to information from Git APIs",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Josh Justice",
+            "email": "josh.justice@northpoint.org"
+        }
+    ],
+    "require": {
+        "npmweb/bitbucket-api": "dev-develop@dev"
+    },
+    "autoload": {
+        "psr-0": {
+            "NpmWeb\\GitApiClient": "src/"
+        }
+    },
+    "minimum-stability": "stable"
+}
