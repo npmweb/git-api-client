@@ -15,11 +15,11 @@ class BitbucketApiClient implements GitApiClientInterface {
     {
         $response = $this->repositoriesClient->all('npmweb');
         $this->handleErrorResponse($response);
-        $repoNames = $this->extractRepoNames( $response );
+        $repoNames = $this->extractRepos( $response );
 
         while( $response = $this->repositoriesClient->next() ) {
             $this->handleErrorResponse($response);
-            $repoNames = array_merge( $repoNames, $this->extractRepoNames( $response, $language ) );
+            $repoNames = array_merge( $repoNames, $this->extractRepos( $response, $language ) );
         }
 
         return $repoNames;
@@ -28,12 +28,11 @@ class BitbucketApiClient implements GitApiClientInterface {
     protected function handleErrorResponse( $response )
     {
         if( 200 != $response->getStatusCode() ) {
-            var_dump($response);
             throw new \Exception('Could not connect to Bitbucket API. '.$response->getStatusCode().': '.$response->getReasonPhrase());
         }
     }
 
-    protected function extractRepoNames( $response, $language = null )
+    protected function extractRepos( $response, $language = null )
     {
         $responseObj = json_decode($response->getContent());
         $repos = $responseObj->values;
@@ -42,10 +41,13 @@ class BitbucketApiClient implements GitApiClientInterface {
                 return !isset($repo->language) || $language == $repo->language;
             });
         }
-        $repoNames = array_map( function($repo) {
-            return $repo->name;
+        $repos = array_map( function($repo) {
+            return (object)array(
+                'name' => $repo->name,
+                'url' => $repo->links->clone[1]->href,
+            );
         }, $repos );
-        return $repoNames;
+        return $repos;
     }
 
 }
